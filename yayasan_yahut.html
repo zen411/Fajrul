@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Yayasan Himmatul Ummah Palembang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* --- HEADER & NAVIGATION --- */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .logo-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            margin-left: 50px; /* Memberi ruang untuk tombol garis 3 di kiri */
+        }
+
+        /* --- TOMBOL GARIS 3 (HAMBURGER) --- */
+        .hamburger-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 1100;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: #fff;
+            border-radius: 2px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Animasi Garis 3 Menjadi Huruf 'X' Saat Menu Terbuka */
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        /* --- SLIDE DRAWER MENU PANELS --- */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Tersembunyi di luar layar kiri awal */
+            width: 300px;
+            height: 100vh;
+            background-color: #1a252f;
+            padding-top: 25px;
+            transition: left 0.4s cubic-bezier(0.77,0.2,0.05,1.0);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+            z-index: 1050;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.open {
+            left: 0; /* Meluncur masuk saat aktif */
+        }
+
+        /* --- LIST UTAMA MENU & HOVER ANIMATION --- */
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-item a, .dropdown-trigger {
+            display: block;
+            padding: 15px 25px;
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: color 0.2s ease;
+        }
+
+        /* Efek Animasi Garis Bawah Gliding Menyamping saat Hover */
+        .menu-item a::after, .dropdown-trigger::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25px;
+            width: 0;
+            height: 2px;
+            background-color: #2ecc71; /* Warna hijau aksen estetik */
+            transition: width 0.3s ease-in-out;
+        }
+
+        .menu-item a:hover::after, .dropdown-trigger:hover::after {
+            width: calc(100% - 50px);
+        }
+
+        .menu-item a:hover, .dropdown-trigger:hover {
+            color: #2ecc71;
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* --- SUB MENU (DROPDOWN PROGRAM) --- */
+        .submenu-list {
+            list-style: none;
+            background-color: #11181f;
+            max-height: 0; /* Sembunyi awal */
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        /* Kelas pemicu via JS untuk membuka submenu */
+        .submenu-list.show {
+            max-height: 120px; /* Berikan ruang yang cukup untuk sub-menu */
+        }
+
+        .submenu-item a {
+            padding: 12px 25px 12px 45px; /* Menjorok ke dalam */
+            font-size: 0.88rem;
+            color: #bdc3c7;
+        }
+
+        /* Indikator Panah Kecil pada Menu Program */
+        .dropdown-trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .arrow-icon {
+            border: solid #ecf0f1;
+            border-width: 0 2px 2px 0;
+            display: inline-block;
+            padding: 3px;
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-trigger.active .arrow-icon {
+            transform: rotate(-135deg);
+            border-color: #2ecc71;
+        }
+
+        /* --- BACKGROUND OVERLAY --- */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 1040;
+        }
+        .menu-overlay.show {
+            display: block;
+        }
+
+        /* Sembunyikan semua seksi halaman secara default */
+.content-section {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Animasi transisi lembut saat menu berganti */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mengatur agar susunan beranda otomatis vertikal saat dibuka di handphone */
+@media (max-width: 600px) {
+    #sec-beranda > div {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="hamburger-btn" id="menuToggle" aria-label="Buka Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="logo-title">YAYASAN HIMMATUL UMMAH PALEMBANG</div>
+        <div style="font-size: 0.8rem; opacity: 0.7; font-weight: 600;">TA. 2026/2027</div>
+    </header>
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <nav class="sidebar-menu" id="sidebarMenu">
+    <div style="text-align: center; padding: 1px 20px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+            <img src="images/logo_yayasan.jpg" alt="Logo Yayasan" style="width: 90px; height: 90px; object-fit: contain; border-radius: 50%; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=LOGO';">
+            <h4 style="color: white; font-size: 0.85rem; letter-spacing: 1px;">HIMMATUL UMMAH</h4>
+        </div>
+        <ul class="menu-list">
+        <li class="menu-item"><a href="javascript:void(0)" onclick="pindahSeksi('beranda')">Beranda</a></li>
+        <li class="menu-item"><a href="javascript:void(0)" onclick="pindahSeksi('kurikulum')">Kurikulum</a></li>
+        
+        <li class="menu-item">
+            <button class="dropdown-trigger" id="dropTrigger">
+                Program <i class="arrow-icon"></i>
+            </button>
+            <ul class="submenu-list" id="subMenuList">
+                <li class="submenu-item"><a href="javascript:void(0)" onclick="pindahSeksi('smp')">SMP Sederajat</a></li>
+                <li class="submenu-item"><a href="javascript:void(0)" onclick="pindahSeksi('sma')">SMA Sederajat</a></li>
+            </ul>
+        </li>
+
+        <li class="menu-item"><a href="javascript:void(0)" onclick="pindahSeksi('ppdb')">PPDB TA. 2026/2027</a></li>
+        <li class="menu-item"><a href="javascript:void(0)" onclick="pindahSeksi('galeri')">Galeri</a></li>
+        <li class="menu-item"><a href="javascript:void(0)" onclick="pindahSeksi('artikel')">Artikel</a></li>
+        <li class="menu-item"><a href="javascript:void(0)" onclick="pindahSeksi('kontak')">Kontak</a></li>
+    </ul>
+
+    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 15px 0;">
+<div style="padding: 0 25px;">
+    <p id="status-mode" style="color: #aaa; font-size: 0.8rem; margin-bottom: 10px;">Mode: Pengunjung</p>
+    <button id="btn-login-logout" onclick="aksiLoginLogout()" style="width:100%; padding: 8px; background: #2980b9; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+        🔑 Login Admin
+    </button>
+</div>
+</nav>
+
+    <!-- KONTEN UTAMA WEBSITE YAYASAN -->
+<main style="padding: 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
+
+   <section id="sec-beranda" class="content-section">
+        <div style="background: white; padding: 40px 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; gap: 25px; position: relative;">
+            <div style="flex-shrink: 0;"><img src="images/logo_yayasan.jpg" style="width: 110px; height: 110px; object-fit: contain;"></div>
+            <div style="flex-grow: 1;">
+                <h2 style="color: #2c3e50; margin-bottom: 5px; font-size: 1.4rem;">Selamat Datang di Website Resmi</h2>
+                <h1 id="txt-judul-beranda" style="color: #27ae60; margin-bottom: 20px; font-size: 2rem;">Loading...</h1>
+                <p id="txt-isi-beranda" style="color: #7f8c8d; line-height: 1.8;">Loading...</p>
+                
+                <button class="btn-edit-konten" onclick="bukaFiturEdit('beranda')" style="display:none; margin-top: 15px; padding: 5px 15px; background: #f39c12; color: white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">✏️ Edit Konten Beranda</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="sec-kurikulum" class="content-section">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative;">
+            <h2 id="txt-judul-kurikulum" style="color: #2c3e50; border-bottom: 3px solid #2ecc71; padding-bottom: 10px; margin-bottom: 20px;">Loading...</h2>
+            <p id="txt-isi-kurikulum" style="color: #555; line-height: 1.7; white-space: pre-line;">Loading...</p>
+            
+            <button class="btn-edit-konten" onclick="bukaFiturEdit('kurikulum')" style="display:none; margin-top: 15px; padding: 5px 15px; background: #f39c12; color: white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">✏️ Edit Konten Kurikulum</button>
+        </div>
+    </section>
+
+    <!-- 3. SEKSI PROGRAM SMP -->
+    <section id="sec-smp" class="content-section">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">Program SMP Sederajat</h2>
+            <p style="color: #555; line-height: 1.7;">
+                Pendidikan tingkat menengah yang berfokus pada pemantapan aqidah, penguatan dasar ilmu pengetahuan umum, serta akselerasi hafalan Al-Qur'an sebagai bekal dasar memasuki masa remaja yang produktif dan terarah.
+            </p>
+        </div>
+    </section>
+
+    <!-- 4. SEKSI PROGRAM SMA -->
+    <section id="sec-sma" class="content-section">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">Program SMA Sederajat</h2>
+            <p style="color: #555; line-height: 1.7;">
+                Mempersiapkan santri tingkat akhir menuju gerbang perguruan tinggi nasional maupun internasional. Program ini diperkaya dengan pemalaman kitab keislaman dasar, kepemimpinan organisasi, serta bimbingan karir akademik jangka panjang.
+            </p>
+        </div>
+    </section>
+
+    <!-- 5. SEKSI PPDB -->
+    <section id="sec-ppdb" class="content-section">
+        <div style="background: #e8f8f5; padding: 30px; border-radius: 8px; border-left: 5px solid #2ecc71;">
+            <h2 style="color: #117a65; margin-bottom: 10px;">Penerimaan Peserta Didik Baru (PPDB) TA. 2026/2027</h2>
+            <p style="color: #16a085; margin-bottom: 20px;">
+                Pendaftaran untuk gelombang pertama telah dibuka! Klik tombol pendaftaran di bawah ini untuk mengisi formulir dan mengunggah berkas persyaratan.
+            </p>
+            <!-- Tombol memicu modal pendaftaran yang kita buat sebelumnya -->
+            <button style="padding: 12px 25px; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSd28ozqnG2qc7iaMlGmyaZDY94Hf5eBOR92tDhcSYOfzSP4XA/viewform?usp=header">Formulir Pendaftaran Online</a>
+            </button>
+        </div>
+    </section>
+
+    <!-- 6. SEKSI GALERI -->
+    <section id="sec-galeri" class="content-section">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">Galeri Kegiatan</h2>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">Dokumentasi visual lingkungan belajar, fasilitas, dan aktivitas harian santri.</p>
+            <!-- Di sinilah letak slider 5 guliran foto otomatis yang Anda miliki sebelumnya -->
+            <div id="tempat-slider-anda"></div> 
+        </div>
+    </section>
+
+    <!-- 7. SEKSI ARTIKEL -->
+    <section id="sec-artikel" class="content-section">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">Artikel & Kabar Yayasan</h2>
+            <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                <h4 style="color: #2980b9; margin-bottom: 5px;">Tips Menjaga Istiqomah Menghafal Al-Qur'an bagi Remaja</h4>
+                <small style="color: #aaa;">Diposting pada Juni 2026</small>
+            </div>
+            <div>
+                <h4 style="color: #2980b9; margin-bottom: 5px;">Kunjungan Silahturahmi Tokoh Agama di Kampus YAHUT Tanjung Barangan</h4>
+                <small style="color: #aaa;">Diposting pada Mei 2026</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. SEKSI KONTAK -->
+    <section id="sec-kontak" class="content-section">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">Hubungi Kami</h2>
+            <p style="color: #555; line-height: 1.8;">
+                <strong>Alamat Kampus:</strong> Jalan Tanjung Barangan, RT.04 / RW.02, Kel. Talang Kelapa, Kec. Alang-Alang Lebar, Kota Palembang, Sumatera Selatan.<br>
+                <strong>WhatsApp Layanan:</strong> 0812-XXXX-XXXX<br>
+                <strong>Email Resmi:</strong> info@himmatulummahpalembang.sch.id
+            </p>
+        </div>
+    </section>
+
+</main>
+
+<div id="modalLoginAdmin" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 350px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative;">
+        <h3 style="margin-top: 0; text-align: center; color: #2c3e50; margin-bottom: 15px;">Login Administrator</h3>
+        <form onsubmit="prosesLoginAdmin(event)">
+            <input type="text" id="log-username" placeholder="Username" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <input type="password" id="log-password" placeholder="Password" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="submit" style="width: 100%; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Masuk</button>
+            <button type="button" onclick="tutupModalLogin()" style="width: 100%; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px;">Batal</button>
+        </form>
+    </div>
+</div>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const dropTrigger = document.getElementById('dropTrigger');
+        const subMenuList = document.getElementById('subMenuList');
+
+        // Fungsi Membuka & Menutup Sidebar Menu Utama
+        function toggleSidebar() {
+            menuToggle.classList.toggle('active');
+            sidebarMenu.classList.toggle('open');
+            menuOverlay.classList.toggle('show');
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        menuOverlay.addEventListener('click', toggleSidebar);
+
+        // Fungsi Buka Tutup Sub-Menu Program (SMP & SMA)
+        dropTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            subMenuList.classList.toggle('show');
+        });
+
+        // --- FUNGSI MENGATUR PINDAH HALAMAN SEKSI ---
+function pindahSeksi(namaSeksi) {
+    // 1. Sembunyikan semua seksi yang ada di halaman
+    const semuaSeksi = document.querySelectorAll('.content-section');
+    semuaSeksi.forEach(seksi => {
+        seksi.style.display = 'none';
+    });
+
+    // 2. Tampilkan hanya seksi yang dituju oleh pengguna
+    const seksiTarget = document.getElementById('sec-' + namaSeksi);
+    if (seksiTarget) {
+        seksiTarget.style.display = 'block';
+    }
+
+    // 3. Otomatis tutup sidebar menu (jika sedang terbuka di handphone)
+    if (typeof toggleSidebar === "function" && document.getElementById('sidebarMenu').classList.contains('open')) {
+        toggleSidebar(); 
+    }
+}
+
+// --- OTOMATISASI: JALANKAN SEKSI BERANDA SAAT WEBSITE PERTAMA KALI DIBUKA ---
+document.addEventListener("DOMContentLoaded", function() {
+    pindahSeksi('beranda');
+});
+
+const API_URL = 'api.php'; // Sesuaikan jika letak api.php Anda berada di folder lain
+let isAdminLoggedIn = false;
+let dataKontenGlobal = {};
+
+// --- MUAT DATA DARI DATABASE SAAT HALAMAN DIBUKA ---
+function loadKontenDariDatabase() {
+    fetch(`${API_URL}?action=get_all_konten`)
+    .then(res => res.json())
+    .then(res => {
+        if(res.status === 'success') {
+            dataKontenGlobal = res.data;
+            // Distribusikan data ke elemen HTML masing-masing
+            const listMenu = ['beranda', 'kurikulum', 'smp', 'sma', 'ppdb', 'kontak'];
+            listMenu.forEach(menu => {
+                if(dataKontenGlobal[menu]) {
+                    if(document.getElementById(`txt-judul-${menu}`)) {
+                        document.getElementById(`txt-judul-${menu}`).innerText = dataKontenGlobal[menu].judul;
+                    }
+                    if(document.getElementById(`txt-isi-${menu}`)) {
+                        document.getElementById(`txt-isi-${menu}`).innerText = dataKontenGlobal[menu].isi;
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Jalankan pemanggilan data pertama kali halaman dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    loadKontenDariDatabase();
+    pindahSeksi('beranda');
+});
+
+// --- SISTEM KONTROL MODAL LOGIN ---
+function aksiLoginLogout() {
+    if(isAdminLoggedIn) {
+        // Proses Logout
+        isAdminLoggedIn = false;
+        document.getElementById('status-mode').innerText = "Mode: Pengunjung";
+        document.getElementById('btn-login-logout').innerText = "🔑 Login Admin";
+        document.getElementById('btn-login-logout').style.background = "#2980b9";
+        alert("Anda telah keluar dari mode administrator.");
+        
+        // Sembunyikan semua tombol edit
+        document.querySelectorAll('.btn-edit-konten').forEach(b => b.style.display = 'none');
+    } else {
+        document.getElementById('modalLoginAdmin').style.display = 'flex';
+    }
+}
+
+function tutupModalLogin() {
+    document.getElementById('modalLoginAdmin').style.display = 'none';
+}
+
+function prosesLoginAdmin(event) {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('username', document.getElementById('log-username').value);
+    formData.append('password', document.getElementById('log-password').value);
+
+    fetch(`${API_URL}?action=login_admin`, { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            isAdminLoggedIn = true;
+            tutupModalLogin();
+            document.getElementById('status-mode').innerText = "Mode: Administrator 🟢";
+            document.getElementById('btn-login-logout').innerText = "🚪 Logout Admin";
+            document.getElementById('btn-login-logout').style.background = "#c0392b";
+            alert("Selamat Datang Kembali Admin Yayasan!");
+
+            // Munculkan semua tombol edit konten
+            document.querySelectorAll('.btn-edit-konten').forEach(b => b.style.display = 'inline-block');
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+// --- FUNGSI EDIT ISI MENU VIA PROMPT NYAMAN ---
+function bukaFiturEdit(namaMenu) {
+    if(!isAdminLoggedIn) return;
+    
+    const dataLama = dataKontenGlobal[namaMenu];
+    const judulBaru = prompt(`[EDIT JUDUL] Masukkan judul baru untuk menu ${namaMenu}:`, dataLama.judul);
+    if(judulBaru === null) return;
+
+    const isiBaru = prompt(`[EDIT ISI KONTEN] Masukkan materi konten baru untuk menu ${namaMenu}:`, dataLama.isi);
+    if(isiBaru === null) return;
+
+    const formData = new FormData();
+    formData.append('nama_menu', namaMenu);
+    formData.append('judul', judulBaru);
+    formData.append('isi_konten', isiBaru);
+
+    fetch(`${API_URL}?action=update_konten_menu`, { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            alert(`🟢 Berhasil memperbarui isi menu ${namaMenu}!`);
+            loadKontenDariDatabase(); // Segarkan teks di layar secara realtime
+        } else {
+            alert("Gagal: " + data.message);
+        }
+    });
+}
+    </script>
+</body>
+</html>
